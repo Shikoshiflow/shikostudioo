@@ -1,0 +1,8 @@
+{
+  "portfolio": true,
+  "about": true,
+  "future": true,
+  "contact": true,
+  "filter": true,
+  "form": true
+}

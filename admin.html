@@ -1,0 +1,1897 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shiko Studio - Панель управления</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-primary: #0a0a0a;
+            --bg-secondary: #111111;
+            --bg-tertiary: #1a1a1a;
+            --bg-card: #141414;
+            --bg-hover: #1f1f1f;
+            
+            --text-primary: #ffffff;
+            --text-secondary: #a0a0a0;
+            --text-muted: #666666;
+            
+            --accent-primary: #6366f1;
+            --accent-secondary: #8b5cf6;
+            --accent-success: #10b981;
+            --accent-warning: #f59e0b;
+            --accent-error: #ef4444;
+            
+            --border-primary: rgba(255, 255, 255, 0.1);
+            --border-hover: rgba(255, 255, 255, 0.2);
+            
+            --radius-sm: 6px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            
+            --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            font-size: 14px;
+            overflow-x: hidden;
+        }
+
+        .admin-layout {
+            min-height: 100vh;
+            display: grid;
+            grid-template-areas: 
+                "sidebar header"
+                "sidebar main";
+            grid-template-columns: 320px 1fr;
+            grid-template-rows: 80px 1fr;
+        }
+
+        .sidebar {
+            grid-area: sidebar;
+            background: var(--bg-secondary);
+            border-right: 1px solid var(--border-primary);
+            position: fixed;
+            width: 320px;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 50;
+        }
+
+        .sidebar-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-primary);
+            background: var(--bg-tertiary);
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            text-decoration: none;
+            color: var(--text-primary);
+        }
+
+        .logo-icon {
+            width: 40px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .logo-text {
+            font-weight: 700;
+            font-size: 20px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .sidebar-nav {
+            padding: 24px 20px;
+        }
+
+        .nav-section {
+            margin-bottom: 32px;
+        }
+
+        .nav-section-title {
+            font-size: 11px;
+            font-weight: 700;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            margin-bottom: 16px;
+            padding: 0 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .nav-items {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+            padding: 14px 16px;
+            border-radius: var(--radius-md);
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 14px;
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .nav-item:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+            transform: translateX(4px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+            transform: translateX(4px);
+        }
+
+        .nav-icon {
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .nav-badge {
+            margin-left: auto;
+            background: var(--accent-success);
+            color: white;
+            font-size: 10px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 10px;
+            min-width: 18px;
+            text-align: center;
+        }
+
+        .header {
+            grid-area: header;
+            background: var(--bg-secondary);
+            border-bottom: 1px solid var(--border-primary);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 32px;
+            position: fixed;
+            width: calc(100% - 320px);
+            right: 0;
+            top: 0;
+            z-index: 40;
+        }
+
+        .breadcrumb {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .current-section {
+            color: var(--text-primary);
+            font-weight: 600;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .status-indicator {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid var(--accent-success);
+            border-radius: var(--radius-md);
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--accent-success);
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            background: var(--accent-success);
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .main {
+            grid-area: main;
+            padding: 32px;
+            margin-left: 320px;
+            margin-top: 80px;
+            min-height: calc(100vh - 80px);
+        }
+
+        .section {
+            display: none;
+        }
+
+        .section.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-lg);
+            margin-bottom: 24px;
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            border-color: var(--border-hover);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .card-header {
+            padding: 24px;
+            border-bottom: 1px solid var(--border-primary);
+            background: var(--bg-tertiary);
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+        }
+
+        .card-title {
+            font-size: 20px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .card-subtitle {
+            color: var(--text-secondary);
+            font-size: 14px;
+        }
+
+        .card-badge {
+            background: var(--accent-primary);
+            color: white;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 10px;
+            font-weight: 600;
+        }
+
+        .card-content {
+            padding: 24px;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            padding: 12px 20px;
+            border: none;
+            border-radius: var(--radius-md);
+            font-size: 14px;
+            font-weight: 500;
+            font-family: inherit;
+            cursor: pointer;
+            text-decoration: none;
+            transition: var(--transition);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.3);
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(99, 102, 241, 0.4);
+        }
+
+        .btn-secondary {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            border: 1px solid var(--border-primary);
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-hover);
+            border-color: var(--border-hover);
+        }
+
+        .btn-success {
+            background: var(--accent-success);
+            color: white;
+        }
+
+        .btn-warning {
+            background: var(--accent-warning);
+            color: white;
+        }
+
+        .btn-danger {
+            background: var(--accent-error);
+            color: white;
+        }
+
+        .btn-sm {
+            padding: 8px 12px;
+            font-size: 12px;
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .form-control {
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            padding: 12px 16px;
+            color: var(--text-primary);
+            font-size: 14px;
+            width: 100%;
+            font-family: inherit;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: var(--accent-primary);
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+        }
+
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .projects-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 24px;
+        }
+
+        .project-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            border-color: var(--border-hover);
+        }
+
+        .project-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 20px 20px 0 20px;
+            gap: 12px;
+        }
+
+        .project-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin: 0;
+            flex: 1;
+            line-height: 1.3;
+        }
+
+        .status-badge {
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 10px;
+            font-weight: 600;
+            color: white;
+            white-space: nowrap;
+            flex-shrink: 0;
+        }
+
+        .active-status {
+            background: var(--accent-success) !important;
+        }
+
+        .project-card-content {
+            padding: 16px 20px;
+            flex: 1;
+        }
+
+        .project-description {
+            color: var(--text-secondary);
+            margin-bottom: 16px;
+            line-height: 1.4;
+            font-size: 14px;
+        }
+
+        .project-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            gap: 12px;
+        }
+
+        .category-badge {
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 11px;
+            font-weight: 500;
+            text-transform: uppercase;
+        }
+
+        .category-web { background: #3b82f620; color: #3b82f6; }
+        .category-app { background: #10b98120; color: #10b981; }
+        .category-image { background: #f59e0b20; color: #f59e0b; }
+        .category-video { background: #ef444420; color: #ef4444; }
+        .category-design { background: #8b5cf620; color: #8b5cf6; }
+
+        .project-tech {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tech-mini {
+            font-size: 16px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: var(--bg-tertiary);
+            border-radius: 50%;
+        }
+
+        .tech-count {
+            font-size: 10px;
+            color: var(--text-muted);
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .project-tags {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 4px;
+            margin-bottom: 16px;
+        }
+
+        .tag-mini {
+            padding: 2px 6px;
+            background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary));
+            color: white;
+            border-radius: 10px;
+            font-size: 10px;
+            font-weight: 500;
+        }
+
+        .tag-mini.no-tags {
+            background: var(--bg-tertiary);
+            color: var(--text-muted);
+        }
+
+        .tag-count {
+            font-size: 10px;
+            color: var(--text-muted);
+            background: var(--bg-tertiary);
+            padding: 2px 6px;
+            border-radius: 10px;
+        }
+
+        .project-card.project-coming-soon {
+            opacity: 0.85;
+            border-color: var(--accent-secondary);
+        }
+
+        .project-card.project-coming-soon::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(139, 92, 246, 0.1) 0%, rgba(99, 102, 241, 0.1) 100%);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .project-status-badge {
+            position: absolute;
+            top: 16px;
+            right: 16px;
+            background: linear-gradient(135deg, var(--accent-secondary), var(--accent-primary));
+            color: white;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 11px;
+            font-weight: 600;
+            z-index: 2;
+            box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+            animation: glow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes glow {
+            from {
+                box-shadow: 0 2px 8px rgba(139, 92, 246, 0.3);
+            }
+            to {
+                box-shadow: 0 4px 16px rgba(139, 92, 246, 0.5);
+            }
+        }
+
+        .project-image {
+            width: 100%;
+            height: 200px;
+            background: var(--bg-tertiary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 48px;
+            color: var(--text-muted);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .project-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .project-content {
+            padding: 20px;
+            position: relative;
+            z-index: 2;
+        }
+
+        .project-title {
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+
+        .project-category {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            display: inline-block;
+            margin-bottom: 12px;
+        }
+
+        .project-description {
+            color: var(--text-secondary);
+            font-size: 14px;
+            margin-bottom: 16px;
+            line-height: 1.5;
+        }
+
+        .project-actions {
+            display: flex;
+            gap: 8px;
+            padding: 0 20px 20px 20px;
+            border-top: 1px solid var(--border-primary);
+            margin-top: auto;
+            padding-top: 16px;
+        }
+
+        .project-actions .btn {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            padding: 10px 16px;
+            font-size: 13px;
+            border-radius: var(--radius-md);
+        }
+
+        .project-actions .btn span {
+            font-size: 14px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+            opacity: 0.5;
+        }
+
+        .empty-state-text {
+            font-size: 18px;
+            margin-bottom: 20px;
+        }
+
+        .notification-container {
+            position: fixed;
+            top: 100px;
+            right: 20px;
+            z-index: 10000;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-width: 400px;
+        }
+
+        .notification {
+            padding: 16px 20px;
+            border-radius: var(--radius-md);
+            color: white;
+            font-weight: 500;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+            animation: slideInRight 0.3s ease;
+            position: relative;
+            cursor: pointer;
+        }
+
+        .notification.success {
+            background: var(--accent-success);
+        }
+
+        .notification.error {
+            background: var(--accent-error);
+        }
+
+        .notification.info {
+            background: var(--accent-primary);
+        }
+
+        .notification.warning {
+            background: var(--accent-warning);
+        }
+
+        .notification-close {
+            position: absolute;
+            top: 8px;
+            right: 12px;
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 16px;
+            opacity: 0.7;
+        }
+
+        .notification-close:hover {
+            opacity: 1;
+        }
+
+        @keyframes slideInRight {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes slideOutRight {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+
+        .gradient-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .gradient-toggle {
+            position: relative;
+            width: 50px;
+            height: 24px;
+            background: var(--bg-tertiary);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: var(--transition);
+            border: 1px solid var(--border-primary);
+        }
+
+        .gradient-toggle.active {
+            background: var(--accent-primary);
+        }
+
+        .gradient-toggle::after {
+            content: '';
+            position: absolute;
+            top: 1px;
+            left: 1px;
+            width: 22px;
+            height: 22px;
+            background: white;
+            border-radius: 50%;
+            transition: var(--transition);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .gradient-toggle.active::after {
+            transform: translateX(26px);
+        }
+
+        .color-picker {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            border: 2px solid var(--border-primary);
+        }
+
+        .auto-save-indicator {
+            font-size: 12px;
+            color: var(--text-muted);
+            padding: 4px 8px;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+            display: inline-block;
+            margin-left: 12px;
+        }
+
+        .auto-save-indicator.saving {
+            color: var(--accent-warning);
+        }
+
+        .auto-save-indicator.saved {
+            color: var(--accent-success);
+        }
+
+        .auto-save-indicator.error {
+            color: var(--accent-error);
+        }
+
+        .project-editor {
+            display: none;
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-lg);
+            padding: 24px;
+            margin-top: 24px;
+        }
+
+        .project-editor.active {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .editor-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 1px solid var(--border-primary);
+        }
+
+        .editor-title {
+            font-size: 18px;
+            font-weight: 600;
+        }
+
+        .image-preview {
+            width: 100%;
+            height: 200px;
+            background: var(--bg-tertiary);
+            border: 2px dashed var(--border-primary);
+            border-radius: var(--radius-md);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+
+        .image-preview img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: var(--radius-sm);
+        }
+
+        .tags-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            min-height: 40px;
+            padding: 8px;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            margin-bottom: 16px;
+        }
+
+        .tag {
+            background: var(--accent-primary);
+            color: white;
+            padding: 4px 8px;
+            border-radius: var(--radius-sm);
+            font-size: 12px;
+            display: flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .tag-remove {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            font-size: 14px;
+            line-height: 1;
+        }
+
+        .tag-input {
+            flex: 1;
+            min-width: 120px;
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .tag-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .project-form {
+            display: grid;
+            gap: 20px;
+        }
+
+        .tech-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .tech-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: var(--bg-tertiary);
+            padding: 12px;
+            border-radius: var(--radius-md);
+            border: 1px solid var(--border-primary);
+        }
+
+        .tech-icon-input {
+            width: 40px;
+            height: 40px;
+            text-align: center;
+            font-size: 18px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-primary);
+            border-radius: var(--radius-sm);
+        }
+
+        .tech-name-input {
+            flex: 1;
+            background: none;
+            border: none;
+            outline: none;
+            color: var(--text-primary);
+            font-size: 14px;
+        }
+
+        .status-selector {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 20px;
+        }
+
+        .status-option {
+            flex: 1;
+            padding: 12px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-primary);
+            border-radius: var(--radius-md);
+            text-align: center;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .status-option.active {
+            border-color: var(--accent-primary);
+            background: rgba(99, 102, 241, 0.1);
+        }
+
+        .status-option.coming-soon.active {
+            border-color: var(--accent-secondary);
+            background: rgba(139, 92, 246, 0.1);
+        }
+
+        @media (max-width: 1200px) {
+            .projects-grid {
+                grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            }
+        }
+
+        @media (max-width: 768px) {
+            .admin-layout {
+                grid-template-columns: 1fr;
+                grid-template-areas: 
+                    "header"
+                    "main";
+            }
+
+            .sidebar {
+                display: none;
+            }
+
+            .header {
+                width: 100%;
+                margin-left: 0;
+            }
+
+            .main {
+                margin-left: 0;
+                padding: 20px;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .project-actions {
+                flex-direction: column;
+            }
+        }
+
+        /* Drag & Drop стили */
+        .image-dropzone {
+            border: 2px dashed var(--border-color);
+            border-radius: 12px;
+            padding: 40px 20px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: linear-gradient(135deg, var(--bg-tertiary) 0%, var(--bg-card) 100%);
+            margin-bottom: 20px;
+        }
+
+        .image-dropzone:hover,
+        .image-dropzone.dragover {
+            border-color: var(--accent-color);
+            background: linear-gradient(135deg, rgba(121, 40, 202, 0.1) 0%, var(--bg-card) 100%);
+            transform: translateY(-2px);
+        }
+
+        .dropzone-content {
+            pointer-events: none;
+        }
+
+        .dropzone-icon {
+            font-size: 48px;
+            margin-bottom: 16px;
+            opacity: 0.8;
+        }
+
+        .dropzone-text {
+            font-size: 16px;
+            color: var(--text-primary);
+            margin-bottom: 8px;
+            line-height: 1.4;
+        }
+
+        .dropzone-hint {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .url-input-section {
+            margin-top: 16px;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .url-input-header {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 12px;
+            font-size: 14px;
+            color: var(--text-secondary);
+        }
+
+        .url-input-group {
+            display: flex;
+            gap: 8px;
+        }
+
+        .url-input-group input {
+            flex: 1;
+        }
+
+        .url-input-group .btn {
+            min-width: 44px;
+            padding: 8px 12px;
+        }
+
+        /* Улучшенная сетка превью изображений */
+        .images-preview-grid {
+            margin-top: 16px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+            gap: 16px;
+        }
+
+        .image-preview-item {
+            position: relative;
+            border-radius: 8px;
+            overflow: hidden;
+            background: var(--bg-tertiary);
+            border: 1px solid var(--border-color);
+        }
+
+        .image-preview-item img {
+            width: 100%;
+            height: 120px;
+            object-fit: cover;
+            transition: transform 0.3s ease;
+        }
+
+        .image-preview-item:hover img {
+            transform: scale(1.05);
+        }
+
+        .btn-remove-image {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            background: rgba(239, 68, 68, 0.9);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            width: 28px;
+            height: 28px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 16px;
+            font-weight: bold;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+
+        .btn-remove-image:hover {
+            background: rgba(239, 68, 68, 1);
+            transform: scale(1.1);
+        }
+
+        /* Новый селектор статусов */
+        .status-selector-new {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .status-option-new {
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border: 2px solid var(--border-color);
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .status-option-new:hover {
+            background: var(--bg-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        .status-option-new.active {
+            border-color: var(--accent-color);
+            background: linear-gradient(135deg, rgba(121, 40, 202, 0.15) 0%, var(--bg-tertiary) 100%);
+        }
+
+        .status-option-new.active::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--accent-color), var(--accent-secondary));
+        }
+
+        .status-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .status-info {
+            flex: 1;
+        }
+
+        .status-name {
+            font-weight: 600;
+            font-size: 14px;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+        }
+
+        .status-desc {
+            font-size: 12px;
+            color: var(--text-secondary);
+            line-height: 1.3;
+        }
+
+        /* Быстрый выбор технологий */
+        .tech-quick-select {
+            margin-bottom: 20px;
+            padding: 16px;
+            background: var(--bg-tertiary);
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+        }
+
+        .tech-quick-title {
+            font-size: 12px;
+            font-weight: 500;
+            color: var(--text-secondary);
+            margin-bottom: 12px;
+        }
+
+        .tech-quick-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 8px;
+        }
+
+        .tech-quick-item {
+            padding: 8px 12px;
+            background: var(--bg-card);
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            font-size: 12px;
+            color: var(--text-primary);
+        }
+
+        .tech-quick-item:hover {
+            background: var(--bg-hover);
+            border-color: var(--accent-color);
+            transform: translateY(-1px);
+        }
+
+        .tech-quick-item.added {
+            background: rgba(121, 40, 202, 0.2);
+            border-color: var(--accent-color);
+            color: var(--accent-color);
+            cursor: not-allowed;
+        }
+
+        .tech-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+        }
+
+        .btn-tertiary {
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border: 1px solid var(--border-color);
+        }
+
+        .btn-tertiary:hover {
+            background: var(--bg-hover);
+            color: var(--text-primary);
+        }
+    </style>
+</head>
+<body>
+    <div class="notification-container" id="notification-container"></div>
+
+    <div class="admin-layout">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <a href="/" class="logo">
+                    <div class="logo-icon">S</div>
+                    <div class="logo-text">Shiko Studio</div>
+                </a>
+            </div>
+            
+            <nav class="sidebar-nav">
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        <span>📊</span>
+                        <span>Обзор</span>
+                    </div>
+                    <div class="nav-items">
+                        <div class="nav-item active" onclick="showSection('dashboard')">
+                            <div class="nav-icon">🏠</div>
+                            <span>Главная панель</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        <span>✏️</span>
+                        <span>Контент</span>
+                    </div>
+                    <div class="nav-items">
+                        <div class="nav-item" onclick="showSection('hero')">
+                            <div class="nav-icon">🎨</div>
+                            <span>Главная страница</span>
+                        </div>
+                        <div class="nav-item" onclick="showSection('about')">
+                            <div class="nav-icon">👤</div>
+                            <span>О себе</span>
+                        </div>
+                        <div class="nav-item" onclick="showSection('portfolio')">
+                            <div class="nav-icon">💼</div>
+                            <span>Портфолио</span>
+                            <span class="nav-badge" id="portfolio-count">0</span>
+                        </div>
+                        <div class="nav-item" onclick="showSection('future')">
+                            <div class="nav-icon">🚀</div>
+                            <span>Будущие проекты</span>
+                            <span class="nav-badge" id="future-count">0</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="nav-section">
+                    <div class="nav-section-title">
+                        <span>⚙️</span>
+                        <span>Настройки</span>
+                    </div>
+                    <div class="nav-items">
+                        <div class="nav-item" onclick="showSection('features')">
+                            <div class="nav-icon">🎛️</div>
+                            <span>Управление функциями</span>
+                        </div>
+                        <div class="nav-item" onclick="showSection('general')">
+                            <div class="nav-icon">🌐</div>
+                            <span>Общие настройки</span>
+                        </div>
+                        <div class="nav-item" onclick="showSection('contact')">
+                            <div class="nav-icon">📧</div>
+                            <span>Контакты</span>
+                        </div>
+                    </div>
+                </div>
+            </nav>
+        </aside>
+
+        <!-- Header -->
+        <header class="header">
+            <div class="breadcrumb">
+                <span>Shiko Studio</span>
+                <span>/</span>
+                <span class="current-section">Главная панель</span>
+            </div>
+            <div class="header-actions">
+                <div class="status-indicator">
+                    <div class="status-dot"></div>
+                    <span>Онлайн</span>
+                </div>
+                <button class="btn btn-secondary btn-sm" onclick="window.open('/', '_blank')">
+                    <span>👁️</span>
+                    <span>Просмотр сайта</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main">
+            <!-- Dashboard -->
+            <section id="dashboard" class="section active">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">
+                                <span>🎨</span>
+                                Добро пожаловать в Shiko Studio!
+                            </h2>
+                            <p class="card-subtitle">Управляйте своим портфолио легко и эффективно</p>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin-bottom: 24px;">
+                            <div class="stat-card" style="background: var(--bg-tertiary); padding: 20px; border-radius: var(--radius-md); text-align: center;">
+                                <div style="font-size: 32px; margin-bottom: 12px;">💼</div>
+                                <div style="font-size: 24px; font-weight: 700; margin-bottom: 4px;" id="dashboard-portfolio-count">0</div>
+                                <div style="color: var(--text-secondary); font-size: 12px;">Проектов в портфолио</div>
+                            </div>
+                            <div class="stat-card" style="background: var(--bg-tertiary); padding: 20px; border-radius: var(--radius-md); text-align: center;">
+                                <div style="font-size: 32px; margin-bottom: 12px;">🚀</div>
+                                <div style="font-size: 24px; font-weight: 700; margin-bottom: 4px;" id="dashboard-future-count">0</div>
+                                <div style="color: var(--text-secondary); font-size: 12px;">Планируемых проектов</div>
+                            </div>
+                            <div class="stat-card" style="background: var(--bg-tertiary); padding: 20px; border-radius: var(--radius-md); text-align: center;">
+                                <div style="font-size: 32px; margin-bottom: 12px;">📝</div>
+                                <div style="font-size: 24px; font-weight: 700; margin-bottom: 4px;" id="dashboard-changes-count">0</div>
+                                <div style="color: var(--text-secondary); font-size: 12px;">Сохраненных изменений</div>
+                            </div>
+                        </div>
+                        
+                        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px;">
+                            <button class="btn btn-primary" onclick="showSection('portfolio')">
+                                <span>➕</span>
+                                <span>Добавить проект</span>
+                            </button>
+                            <button class="btn btn-secondary" onclick="showSection('hero')">
+                                <span>✏️</span>
+                                <span>Редактировать главную</span>
+                            </button>
+                            <button class="btn btn-secondary" onclick="showSection('about')">
+                                <span>👤</span>
+                                <span>Обновить "О себе"</span>
+                            </button>
+                            <button class="btn btn-secondary" onclick="showSection('contact')">
+                                <span>📧</span>
+                                <span>Изменить контакты</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Hero Section -->
+            <section id="hero" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">
+                                <span>🎨</span>
+                                Главная страница
+                            </h2>
+                            <p class="card-subtitle">Настройте приветственный блок</p>
+                        </div>
+                        <span class="auto-save-indicator" id="hero-auto-save">Автосохранение включено</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-group">
+                            <label class="form-label">Заголовок</label>
+                            <input type="text" id="hero-title" class="form-control" 
+                                   value="Цифровое творчество & инновации"
+                                   placeholder="Введите заголовок">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Настройки градиента для выделенных слов</label>
+                            <div class="gradient-control">
+                                <span>Включить градиент:</span>
+                                <div class="gradient-toggle active" id="gradient-toggle" onclick="toggleGradient()"></div>
+                            </div>
+                            <div id="gradient-colors" style="display: flex; gap: 12px; margin-top: 12px;">
+                                <div>
+                                    <label class="form-label">Цвет 1</label>
+                                    <input type="color" class="color-picker" id="gradient-color1" value="#7928CA">
+                                </div>
+                                <div>
+                                    <label class="form-label">Цвет 2</label>
+                                    <input type="color" class="color-picker" id="gradient-color2" value="#FF0080">
+                                </div>
+                            </div>
+                            <div style="margin-top: 12px; padding: 12px; background: var(--bg-tertiary); border-radius: var(--radius-md); font-size: 12px; color: var(--text-secondary);">
+                                💡 Слова "творчество" и "инновации" будут выделены градиентом
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Описание</label>
+                            <textarea id="hero-description" class="form-control" placeholder="Введите описание">Я создаю уникальные проекты на стыке искусства и технологий. Генерация изображений, видео, разработка сайтов и приложений — всё это мои инструменты для воплощения креативных идей.</textarea>
+                        </div>
+                        
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Первая кнопка</label>
+                                <input type="text" id="hero-btn1-text" class="form-control" value="Мои работы" placeholder="Текст кнопки" style="margin-bottom: 8px;">
+                                <input type="text" id="hero-btn1-link" class="form-control" value="#portfolio" placeholder="Ссылка">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Вторая кнопка</label>
+                                <input type="text" id="hero-btn2-text" class="form-control" value="Связаться" placeholder="Текст кнопки" style="margin-bottom: 8px;">
+                                <input type="text" id="hero-btn2-link" class="form-control" value="#contact" placeholder="Ссылка">
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="saveHero()">
+                            <span>💾</span>
+                            <span>Сохранить изменения</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- About Section -->
+            <section id="about" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">
+                                <span>👤</span>
+                                О себе
+                            </h2>
+                            <p class="card-subtitle">Расскажите о себе и своих навыках</p>
+                        </div>
+                        <span class="auto-save-indicator" id="about-auto-save">Автосохранение включено</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-group">
+                            <label class="form-label">Первый параграф</label>
+                            <textarea id="about-text1" class="form-control" placeholder="Расскажите о себе...">Я специалист в области цифрового творчества и технологий. Моя страсть — создавать уникальные проекты, объединяющие искусство и инновации.</textarea>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Второй параграф</label>
+                            <textarea id="about-text2" class="form-control" placeholder="Продолжите рассказ...">Работая с различными инструментами и технологиями, я стремлюсь воплощать креативные идеи и решать нестандартные задачи.</textarea>
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="saveAbout()">
+                            <span>💾</span>
+                            <span>Сохранить изменения</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Portfolio Section -->
+            <section id="portfolio" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">
+                                <span>💼</span>
+                                Управление портфолио
+                            </h2>
+                            <p class="card-subtitle">Добавляйте и редактируйте свои проекты</p>
+                        </div>
+                        <span class="card-badge" id="portfolio-badge">0 проектов</span>
+                    </div>
+                    <div class="card-content">
+                        <button class="btn btn-primary" onclick="addProject()" style="margin-bottom: 24px;">
+                            <span>➕</span>
+                            <span>Добавить проект</span>
+                        </button>
+                        
+                        <div class="projects-grid" id="projects-list">
+                            <!-- Проекты будут загружены через JS -->
+                        </div>
+
+                        <!-- Project Editor -->
+                        <div class="project-editor" id="project-editor">
+                            <div class="editor-header">
+                                <h3 class="editor-title" id="editor-title">Новый проект</h3>
+                                <button class="btn btn-secondary btn-sm" onclick="cancelProjectEdit()">
+                                    <span>✕</span>
+                                    <span>Отмена</span>
+                                </button>
+                            </div>
+                            
+                            <div class="project-form">
+                                <div class="form-group">
+                                    <label class="form-label">Статус проекта</label>
+                                    <div class="status-selector-new">
+                                        <div class="status-option-new" data-status="active">
+                                            <div class="status-icon">✅</div>
+                                            <div class="status-info">
+                                                <div class="status-name">Готов</div>
+                                                <div class="status-desc">Проект завершен</div>
+                                            </div>
+                                        </div>
+                                        <div class="status-option-new" data-status="coming-soon">
+                                            <div class="status-icon">🚀</div>
+                                            <div class="status-info">
+                                                <div class="status-name">В разработке</div>
+                                                <div class="status-desc">Скоро будет готов</div>
+                                            </div>
+                                        </div>
+                                        <div class="status-option-new" data-status="paused">
+                                            <div class="status-icon">⏸️</div>
+                                            <div class="status-info">
+                                                <div class="status-name">Приостановлен</div>
+                                                <div class="status-desc">Временно не активен</div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Название проекта *</label>
+                                        <input type="text" id="project-title" class="form-control" placeholder="Введите название" required>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Категория</label>
+                                        <select id="project-category" class="form-control">
+                                            <option value="image">🖼️ Изображения</option>
+                                            <option value="video">🎬 Видео</option>
+                                            <option value="web">🌐 Веб-сайты</option>
+                                            <option value="app">📱 Приложения</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Краткое описание</label>
+                                    <textarea id="project-description" class="form-control" placeholder="Краткое описание проекта"></textarea>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Подробное описание</label>
+                                    <textarea id="project-long-description" class="form-control" placeholder="Подробное описание для модального окна"></textarea>
+                                </div>
+                                
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label class="form-label">Изображения проекта</label>
+                                        <div class="image-upload-container">
+                                            <input type="file" id="project-image-file" accept="image/*" style="display: none;" onchange="handleImageUpload(event)" multiple>
+                                            
+                                            <!-- Drag & Drop зона -->
+                                            <div id="image-dropzone" class="image-dropzone" 
+                                                 ondrop="handleImageDrop(event)" 
+                                                 ondragover="handleDragOver(event)" 
+                                                 ondragenter="handleDragEnter(event)" 
+                                                 ondragleave="handleDragLeave(event)"
+                                                 onclick="document.getElementById('project-image-file').click()">
+                                                <div class="dropzone-content">
+                                                    <div class="dropzone-icon">📸</div>
+                                                    <div class="dropzone-text">
+                                                        <strong>Перетащите изображения сюда</strong>
+                                                        <br>или нажмите для выбора файлов
+                                                    </div>
+                                                    <div class="dropzone-hint">PNG, JPG, GIF до 10MB</div>
+                                                </div>
+                                            </div>
+                                            
+                                            <!-- URL input -->
+                                            <div class="url-input-section">
+                                                <div class="url-input-header">
+                                                    <span>🔗</span>
+                                                    <span>Или добавьте по URL</span>
+                                                </div>
+                                                <div class="url-input-group">
+                                                    <input type="text" id="project-image-url" class="form-control" placeholder="https://example.com/image.jpg">
+                                                    <button type="button" class="btn btn-primary btn-sm" onclick="addImageFromURL()">
+                                                        <span>➕</span>
+                                                    </button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div id="project-images-preview" class="images-preview-grid" style="margin-top: 16px; display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px;">
+                                            <!-- Превью изображений -->
+                                        </div>
+                                    </div>
+                                    <div class="form-group">
+                                        <label class="form-label">Ссылка на проект</label>
+                                        <input type="url" id="project-link" class="form-control" placeholder="https://example.com" value="#">
+                                        <div style="font-size: 12px; color: var(--text-secondary); margin-top: 8px;">
+                                            💡 Для проектов "Скоро" ссылка будет неактивной
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="form-group">
+                                    <label class="form-label">Технологии</label>
+                                    
+                                    <!-- Быстрый выбор технологий -->
+                                    <div class="tech-quick-select">
+                                        <div class="tech-quick-title">Быстрый выбор:</div>
+                                        <div class="tech-quick-grid" id="tech-quick-grid">
+                                            <!-- Заполняется через JavaScript -->
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Выбранные технологии -->
+                                    <div id="technologies-container">
+                                        <div class="tech-grid" id="tech-grid">
+                                            <!-- Технологии будут добавляться динамически -->
+                                        </div>
+                                        <div class="tech-actions">
+                                            <button type="button" class="btn btn-secondary btn-sm" onclick="addCustomTechnology()">
+                                                <span>➕</span>
+                                                <span>Добавить свою</span>
+                                            </button>
+                                            <button type="button" class="btn btn-tertiary btn-sm" onclick="clearAllTechnologies()">
+                                                <span>🗑️</span>
+                                                <span>Очистить все</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Теги</label>
+                                    <div id="tags-display" style="margin-bottom: 12px; display: flex; flex-wrap: wrap; gap: 8px; min-height: 40px; padding: 8px; background: var(--bg-secondary); border: 1px solid var(--border-primary); border-radius: var(--radius-md);">
+                                        <!-- Теги будут отображаться здесь -->
+                                    </div>
+                                    <div class="tags-container" id="project-tags" onclick="focusTagInput()">
+                                        <input type="text" class="tag-input" id="tag-input" placeholder="Добавьте тег и нажмите Enter" onkeypress="handleTagInput(event)">
+                                    </div>
+                                </div>
+                                
+                                <div class="project-form-actions" style="display: flex; gap: 12px;">
+                                    <button class="btn btn-tertiary" onclick="previewProject()">
+                                        <span>👁️</span>
+                                        <span>Предпросмотр</span>
+                                    </button>
+                                    <button class="btn btn-primary" onclick="saveProject()">
+                                        <span>💾</span>
+                                        <span>Сохранить проект</span>
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="cancelProjectEdit()">
+                                        <span>✕</span>
+                                        <span>Отмена</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Future Projects Section -->
+            <section id="future" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">
+                                <span>🚀</span>
+                                Будущие проекты
+                            </h2>
+                            <p class="card-subtitle">Планы и идеи на будущее</p>
+                        </div>
+                        <span class="card-badge" id="future-badge">0 планов</span>
+                    </div>
+                    <div class="card-content">
+                        <button class="btn btn-primary" onclick="addFutureProject()" style="margin-bottom: 24px;">
+                            <span>➕</span>
+                            <span>Добавить план</span>
+                        </button>
+                        
+                        <div id="future-projects-list">
+                            <!-- Планы будут загружены через JS -->
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="saveFutureProjects()" style="margin-top: 24px;">
+                            <span>💾</span>
+                            <span>Сохранить все планы</span>
+                        </button>
+                        
+                        <!-- Редактор будущих проектов -->
+                        <div id="future-editor" class="project-editor" style="display: none;">
+                            <div class="editor-header">
+                                <h3>Редактирование плана</h3>
+                                <button class="btn-close" onclick="cancelFutureProject()">×</button>
+                            </div>
+                            <div class="editor-content">
+                                <div class="form-group">
+                                    <label class="form-label">Название проекта</label>
+                                    <input type="text" id="future-title" class="form-control" placeholder="Название будущего проекта">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Планируемая дата</label>
+                                    <input type="text" id="future-date" class="form-control" placeholder="Например: Q2 2025">
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label class="form-label">Описание</label>
+                                    <textarea id="future-description" class="form-control" rows="4" placeholder="Опишите идею проекта"></textarea>
+                                </div>
+                                
+                                <div class="form-actions">
+                                    <button class="btn btn-primary" onclick="saveFutureProject()">
+                                        <span>💾</span>
+                                        <span>Сохранить план</span>
+                                    </button>
+                                    <button class="btn btn-secondary" onclick="cancelFutureProject()">
+                                        <span>✕</span>
+                                        <span>Отмена</span>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Features Management Section -->
+            <section id="features" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">
+                                <span>🎛️</span>
+                                Управление функциями
+                            </h2>
+                            <p class="card-subtitle">Включайте/отключайте разделы сайта</p>
+                        </div>
+                    </div>
+                    <div class="card-content">
+                        <div style="display: grid; gap: 16px;" id="features-list">
+                            <!-- Features будут загружены через JS -->
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="saveFeatures()" style="margin-top: 24px;">
+                            <span>💾</span>
+                            <span>Применить изменения</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- General Settings Section -->
+            <section id="general" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">
+                                <span>🌐</span>
+                                Общие настройки
+                            </h2>
+                            <p class="card-subtitle">Основная информация о сайте</p>
+                        </div>
+                        <span class="auto-save-indicator" id="general-auto-save">Автосохранение включено</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Название сайта</label>
+                                <input type="text" id="site-title" class="form-control" value="Мой сайт-Портфолио" placeholder="Название сайта">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Язык сайта</label>
+                                <select id="site-lang" class="form-control">
+                                    <option value="ru" selected>Русский</option>
+                                    <option value="en">English</option>
+                                    <option value="tr">Türkçe</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="saveGeneral()">
+                            <span>💾</span>
+                            <span>Сохранить настройки</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Contact Section -->
+            <section id="contact" class="section">
+                <div class="card">
+                    <div class="card-header">
+                        <div>
+                            <h2 class="card-title">
+                                <span>📧</span>
+                                Контактная информация
+                            </h2>
+                            <p class="card-subtitle">Управление контактными данными</p>
+                        </div>
+                        <span class="auto-save-indicator" id="contact-auto-save">Автосохранение включено</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label class="form-label">Email</label>
+                                <input type="email" id="contact-email" class="form-control" value="hello@example.com" placeholder="your@email.com">
+                            </div>
+                            <div class="form-group">
+                                <label class="form-label">Телефон</label>
+                                <input type="tel" id="contact-phone" class="form-control" value="+7 (999) 123-45-67" placeholder="+7 (999) 123-45-67">
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="form-label">Адрес</label>
+                            <input type="text" id="contact-address" class="form-control" value="Турция, Стамбул" placeholder="Город, Страна">
+                        </div>
+                        
+                        <button class="btn btn-primary" onclick="saveContact()">
+                            <span>💾</span>
+                            <span>Сохранить контакты</span>
+                        </button>
+                    </div>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="admin.js"></script>
+</body>
+</html>

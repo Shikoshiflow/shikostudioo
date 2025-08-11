@@ -1,0 +1,11 @@
+{
+  "title": "Цифровое <span class=\"accent\">творчество</span> & <span class=\"accent\">инновации</span>",
+  "description": "Я создаю уникальные проекты на стыке искусства и технологий. Генерация изображений, видео, разработка сайтов и приложений — всё это мои инструменты для воплощения креативных идей.",
+  "button1_text": "Мои работы",
+  "button1_link": "#portfolio",
+  "button2_text": "Связаться",
+  "button2_link": "#contact",
+  "gradient_enabled": true,
+  "gradient_color1": "#7928ca",
+  "gradient_color2": "#ff0080"
+}

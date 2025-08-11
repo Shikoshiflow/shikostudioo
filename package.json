@@ -1,0 +1,16 @@
+{
+    "name": "portfolio-admin",
+    "version": "1.0.0",
+    "description": "Простая панель управления для портфолио",
+    "main": "server.js",
+    "scripts": {
+        "start": "node server.js"
+    },
+    "dependencies": {
+        "body-parser": "^1.19.0",
+        "canvas": "^3.1.2",
+        "compression": "^1.8.0",
+        "express": "^4.17.1",
+        "puppeteer": "^24.12.0"
+    }
+}

@@ -1,0 +1,11 @@
+{
+  "email": "artur@example.com",
+  "phone": "+90 531 451 81 08",
+  "address": "Турция, Стамбул",
+  "social": {
+    "linkedin": "https://www.linkedin.com/in/artur",
+    "twitter": "https://twitter.com/artur",
+    "instagram": "https://www.instagram.com/artur",
+    "facebook": "https://www.facebook.com/artur"
+  }
+}
